@@ -1,284 +1,36 @@
 <!doctype html>
-<html lang="th">
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mini Inventory</title>
-<style>
-  :root{--gap:14px;--radius:14px}
-  *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-  body{margin:0;background:#f6f7fb;color:#222}
-  header{padding:18px 16px 6px}
-  h1{margin:0;font-size:26px;letter-spacing:.3px}
-  .container{padding:0 16px 24px}
-  .card{background:#fff;border-radius:var(--radius);padding:var(--gap);box-shadow:0 6px 18px rgba(0,0,0,.07);margin-bottom:var(--gap)}
-  .toolbar{display:flex;gap:8px;flex-wrap:wrap}
-  input,select,button{width:100%;padding:12px;border:1px solid #e1e4ec;border-radius:12px;font-size:16px}
-  input:focus{outline:none;border-color:#6c8bff;box-shadow:0 0 0 3px rgba(108,139,255,.18)}
-  button{border:none;background:#4c6fff;color:#fff;font-weight:600;cursor:pointer}
-  button.secondary{background:#e9edff;color:#334}
-  button.ghost{background:#fff;border:1px dashed #ccd3ff;color:#445}
-  button.danger{background:#ff595e}
-  label{font-size:13px;color:#333;display:block;margin-bottom:6px}
-  .grid{display:grid;grid-template-columns:1fr;gap:var(--gap)}
-  @media (min-width:720px){.grid{grid-template-columns:repeat(2,1fr)}}
-  .full{grid-column:1 / -1}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:12px 10px;border-bottom:1px solid #eee;font-size:14px}
-  th{background:#fafbff;text-align:left;position:sticky;top:0;z-index:1}
-  .tag{display:inline-block;background:#eef2ff;border-radius:999px;padding:2px 8px;font-size:12px}
-  .muted{color:#666;font-size:12px}
-  .actions{display:flex;gap:6px}
-  tr.low td{background:#fff3cd}
-  .table-wrap{overflow:auto;max-height:58vh}
-  footer{padding:10px 16px;color:#888;font-size:12px;text-align:center}
-</style>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mini Inventory · Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module">
+    import { totalCount,totalQty,byLowStock,setActive } from './js/script.js';
+    window.addEventListener('DOMContentLoaded',()=>{
+      setActive('dashboard');
+      document.getElementById('count').textContent = totalCount();
+      document.getElementById('qty').textContent = totalQty();
+      document.getElementById('low').textContent = byLowStock().length;
+    });
+  </script>
 </head>
 <body>
-  <header>
-    <h1>📦 Mini Inventory</h1>
-  </header>
-  <div class="container">
-
-    <div class="card">
-      <div class="toolbar">
-        <input id="search" placeholder="ค้นหา: ชื่อ / SKU / หมวดหมู่">
-        <select id="sort">
-          <option value="updated_desc">เรียง: อัปเดตล่าสุด</option>
-          <option value="name_asc">เรียง: ชื่อ (ก-ฮ)</option>
-          <option value="stock_asc">เรียง: คงเหลือน้อย–มาก</option>
-        </select>
-        <button id="btn-export" class="secondary" title="ดาวน์โหลดข้อมูลเป็น JSON">Export JSON</button>
-        <input id="file-import" type="file" accept="application/json" style="display:none">
-        <button id="btn-import" class="ghost">Import JSON</button>
-        <button id="btn-clear" class="danger">ลบทั้งหมด</button>
-      </div>
-      <div class="muted" style="margin-top:6px">* Low stock = คงเหลือ ≤ Threshold</div>
-    </div>
-
-    <div class="card">
-      <div class="grid">
-        <div class="full"><strong>+ เพิ่ม/แก้ไขสินค้า</strong></div>
-        <div>
-          <label>ชื่อสินค้า *</label>
-          <input id="name" required>
-        </div>
-        <div>
-          <label>SKU *</label>
-          <input id="sku" required>
-        </div>
-        <div>
-          <label>หมวดหมู่</label>
-          <input id="category" placeholder="เช่น ปูน, เหล็ก, สี">
-        </div>
-        <div>
-          <label>หน่วย</label>
-          <input id="unit" placeholder="ถุง, แท่ง, กล.">
-        </div>
-        <div>
-          <label>ราคาทุน</label>
-          <input id="cost" type="number" min="0" step="0.01" inputmode="decimal">
-        </div>
-        <div>
-          <label>ราคาขาย</label>
-          <input id="price" type="number" min="0" step="0.01" inputmode="decimal">
-        </div>
-        <div>
-          <label>คงเหลือ</label>
-          <input id="stock" type="number" min="0" step="1" value="0" inputmode="numeric">
-        </div>
-        <div>
-          <label>Threshold (แจ้งเตือน)</label>
-          <input id="threshold" type="number" min="0" step="1" value="5" inputmode="numeric">
-        </div>
-        <div class="full" style="display:flex;gap:8px">
-          <button id="btn-save" class="primary" style="flex:1">บันทึก</button>
-          <button id="btn-reset" class="secondary" style="flex:1">ล้างฟอร์ม</button>
-        </div>
-      </div>
-      <input type="hidden" id="editingId">
-    </div>
-
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <strong>รายการสินค้า</strong>
-      </div>
-      <div class="table-wrap">
-        <table id="tbl">
-          <thead>
-            <tr>
-              <th>ชื่อ</th>
-              <th>SKU</th>
-              <th>หมวด</th>
-              <th>ขาย/หน่วย</th>
-              <th>คงเหลือ</th>
-              <th>อัปเดต</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <div id="empty" class="muted">ยังไม่มีสินค้า เพิ่มด้านบนได้เลย</div>
-    </div>
-
+  <div class="nav">
+    <a href="index.html" data-page="dashboard">Dashboard</a>
+    <a href="products.html" data-page="products">Products</a>
+    <a href="stock.html" data-page="stock">Stock</a>
   </div>
-  <footer>Made for your portfolio ✨</footer>
-
-<script>
-(function(){
-  const KEY = 'mini_inventory_v2';
-  const $ = (id)=>document.getElementById(id);
-
-  const state = {
-    items: load(),
-    query: '',
-    sort: 'updated_desc'
-  };
-
-  function load(){
-    try{
-      const raw = localStorage.getItem(KEY);
-      return raw ? JSON.parse(raw) : [];
-    }catch(e){ return []; }
-  }
-  function save(){ localStorage.setItem(KEY, JSON.stringify(state.items)); }
-  function uid(){ return (crypto.randomUUID && crypto.randomUUID()) || ('id_'+Date.now()+Math.random().toString(16).slice(2)); }
-  function fmtMoney(v){ if(v==null||v==='') return '-'; return Number(v).toLocaleString('th-TH',{maximumFractionDigits:2}); }
-  function escapeHtml(s){ return (s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
-  function upsert(item){
-    const i = state.items.findIndex(x=>x.id===item.id);
-    if(i>-1) state.items[i]=item; else state.items.push(item);
-    save(); render();
-  }
-  function removeItem(id){ state.items = state.items.filter(x=>x.id!==id); save(); render(); }
-
-  function render(){
-    const q = state.query.toLowerCase();
-    let rows = state.items.filter(x =>
-      [x.name,x.sku,x.category].some(v => (v||'').toLowerCase().includes(q))
-    );
-
-    switch(state.sort){
-      case 'name_asc': rows.sort((a,b)=> (a.name||'').localeCompare(b.name||'')); break;
-      case 'stock_asc': rows.sort((a,b)=> (a.stock||0) - (b.stock||0)); break;
-      default: rows.sort((a,b)=> (b.updatedAt||0) - (a.updatedAt||0));
-    }
-
-    const tb = document.querySelector('#tbl tbody');
-    tb.innerHTML = '';
-    rows.forEach(x=>{
-      const tr = document.createElement('tr');
-      if((x.stock??0) <= (x.threshold??0)) tr.classList.add('low');
-      tr.innerHTML = `
-        <td>${escapeHtml(x.name)}</td>
-        <td><span class="tag">${escapeHtml(x.sku)}</span></td>
-        <td>${escapeHtml(x.category||'-')}</td>
-        <td>${fmtMoney(x.price)} / ${escapeHtml(x.unit||'-')}</td>
-        <td>${x.stock??0} ${escapeHtml(x.unit||'')}</td>
-        <td>${new Date(x.updatedAt||Date.now()).toLocaleString('th-TH')}</td>
-        <td class="actions">
-          <button data-act="edit" data-id="${x.id}" class="secondary">แก้ไข</button>
-          <button data-act="del"  data-id="${x.id}" class="danger">ลบ</button>
-        </td>`;
-      tb.appendChild(tr);
-    });
-
-    $('empty').style.display = rows.length ? 'none' : 'block';
-  }
-
-  // Save
-  $('btn-save').addEventListener('click', (e)=>{
-    const item = {
-      id: $('editingId').value || uid(),
-      name: $('name').value.trim(),
-      sku: $('sku').value.trim(),
-      category: $('category').value.trim(),
-      unit: $('unit').value.trim(),
-      cost: +$('cost').value || 0,
-      price: +$('price').value || 0,
-      stock: +$('stock').value || 0,
-      threshold: +$('threshold').value || 0,
-      updatedAt: Date.now()
-    };
-    if(!item.name || !item.sku){ alert('กรอกชื่อสินค้าและ SKU'); return; }
-    upsert(item);
-    clearForm();
-    window.scrollTo({top:0,behavior:'smooth'});
-  });
-
-  function clearForm(){
-    ['name','sku','category','unit','cost','price','stock','threshold','editingId'].forEach(id=>{$(id).value = ''});
-    $('stock').value = 0; $('threshold').value = 5;
-  }
-
-  $('btn-reset').onclick = clearForm;
-
-  document.querySelector('#tbl').addEventListener('click', (e)=>{
-    const btn = e.target.closest('button'); if(!btn) return;
-    const id = btn.dataset.id;
-    const item = state.items.find(x=>x.id===id);
-    if(btn.dataset.act==='edit' && item){
-      $('editingId').value = item.id;
-      $('name').value = item.name || '';
-      $('sku').value = item.sku || '';
-      $('category').value = item.category || '';
-      $('unit').value = item.unit || '';
-      $('cost').value = item.cost ?? '';
-      $('price').value = item.price ?? '';
-      $('stock').value = item.stock ?? 0;
-      $('threshold').value = item.threshold ?? 5;
-      window.scrollTo({top:0,behavior:'smooth'});
-    }
-    if(btn.dataset.act==='del'){
-      if(confirm('ลบรายการนี้?')) removeItem(id);
-    }
-  });
-
-  $('search').addEventListener('input', e=>{ state.query = e.target.value; render(); });
-  $('sort').addEventListener('change', e=>{ state.sort = e.target.value; render(); });
-
-  $('btn-export').onclick = ()=>{
-    const blob = new Blob([JSON.stringify(state.items,null,2)],{type:'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'inventory.json';
-    a.click();
-    URL.revokeObjectURL(a.href);
-  };
-
-  $('btn-import').onclick = ()=>$('file-import').click();
-  $('file-import').addEventListener('change', async (e)=>{
-    const file = e.target.files[0]; if(!file) return;
-    try{
-      const text = await file.text();
-      const arr = JSON.parse(text);
-      if(Array.isArray(arr)){
-        state.items = arr.filter(Boolean).map(x=>({
-          id: x.id || uid(),
-          name: String(x.name||''),
-          sku: String(x.sku||''),
-          category: x.category||'',
-          unit: x.unit||'',
-          cost: Number(x.cost||0),
-          price: Number(x.price||0),
-          stock: Number(x.stock||0),
-          threshold: Number(x.threshold||0),
-          updatedAt: Number(x.updatedAt||Date.now())
-        }));
-        save(); render();
-      }else alert('ไฟล์ไม่ถูกต้อง');
-    }catch{ alert('อ่านไฟล์ไม่ได้'); }
-    e.target.value = '';
-  });
-
-  $('btn-clear').onclick = ()=>{
-    if(confirm('ลบข้อมูลทั้งหมด?')){ state.items=[]; save(); render(); }
-  };
-
-  render();
-})();
-</script>
+  <div class="container">
+    <h1>Dashboard</h1>
+    <div class="grid grid2">
+      <div class="card"><div class="muted small">Products</div><h2 id="count">0</h2></div>
+      <div class="card"><div class="muted small">Total Quantity</div><h2 id="qty">0</h2></div>
+      <div class="card"><div class="muted small">Low Stock (≤5)</div><h2 id="low">0</h2></div>
+      <div class="card">
+        <div class="muted small">Tip</div>
+        <p class="muted">Add items in <b>Products</b>, check critical levels in <b>Stock</b>.</p>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

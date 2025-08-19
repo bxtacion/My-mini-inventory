@@ -1,20 +1,10 @@
-# My Mini Inventory
+# Mini Inventory (multi‑page)
 
-A simple web-based inventory management system for adding, listing, and managing items.
+Simple multi‑page demo (pure HTML + CSS + JS) that stores data in `localStorage`.
 
-## Features
-- Add new items with name, quantity, and price  
-- Display all items in a table format  
-- Calculate total inventory value automatically  
-- Lightweight, built with HTML + JavaScript  
+**Pages**
+- `index.html` — Dashboard
+- `products.html` — Add/Edit products
+- `stock.html` — View low stock, export/import JSON
 
-## How to Use
-1. Open the project via GitHub Pages:  
-   👉 [Live Demo](https://bxtacion.github.io/My-mini-inventory/)
-
-2. Or clone this repository and open `index.html` in your browser.
-
-## Tech Stack
-- HTML  
-- CSS  
-- JavaScript
+Open `index.html` to start. All files are lowercase for mobile friendliness.

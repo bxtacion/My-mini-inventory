@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mini Inventory · Stock</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module">
+    import { getItems, byLowStock, exportJson, importJson, setActive } from './js/script.js';
+    const $ = s=>document.querySelector(s);
+    function render(){
+      const low = byLowStock();
+      const tbL = $('#low'); tbL.innerHTML='';
+      low.forEach(x=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = \`<td>\${x.name}</td><td>\${x.qty}</td><td>\${x.threshold}</td>\`;
+        tbL.appendChild(tr);
+      });
+      const all = getItems();
+      const tb = $('#all'); tb.innerHTML='';
+      all.forEach(x=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = \`<td>\${x.name}</td><td>\${x.sku||'-'}</td><td>\${x.qty}</td><td>฿\${(+x.price).toLocaleString()}</td>\`;
+        tb.appendChild(tr);
+      });
+      $('#empty').style.display = all.length? 'none':'block';
+    }
+    window.addEventListener('DOMContentLoaded',()=>{
+      setActive('stock');
+      render();
+      $('#btn-export').onclick = exportJson;
+      $('#file').addEventListener('change',e=> importJson(e.target.files[0], ok=>{ if(ok) render(); }));
+    });
+  </script>
+</head>
+<body>
+  <div class="nav">
+    <a href="index.html" data-page="dashboard">Dashboard</a>
+    <a href="products.html" data-page="products">Products</a>
+    <a href="stock.html" data-page="stock">Stock</a>
+  </div>
+  <div class="container">
+    <h1>Stock</h1>
+    <div class="card">
+      <div class="toolbar">
+        <button id="btn-export">Export JSON</button>
+        <input id="file" type="file" accept="application/json">
+      </div>
+    </div>
+    <div class="card">
+      <h3>Low stock (≤ threshold)</h3>
+      <table class="table"><thead><tr><th>Name</th><th>Qty</th><th>Threshold</th></tr></thead><tbody id="low"></tbody></table>
+    </div>
+    <div class="card">
+      <h3>All items</h3>
+      <div id="empty" class="muted">No items yet. Please add products on the <b>Products</b> page.</div>
+      <table class="table"><thead><tr><th>Name</th><th>SKU</th><th>Qty</th><th>Price</th></tr></thead><tbody id="all"></tbody></table>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mini Inventory · Products</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module">
+    import { getItems, upsert, remove, newItem, setActive } from './js/script.js';
+    const $ = s=>document.querySelector(s);
+    let editing=null;
+    function render(){
+      const items = getItems();
+      const tbody = $('#rows'); tbody.innerHTML='';
+      items.forEach((x,i)=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = \`
+          <td>\${x.name}<div class="muted small">\${x.sku||'-'}</div></td>
+          <td>\${x.category||'-'}</td>
+          <td>\${x.qty}</td>
+          <td>฿\${(+x.price).toLocaleString()}</td>
+          <td>
+            <button data-i="\${i}" class="edit">Edit</button>
+            <button data-id="\${x.id}" class="del" style="background:#ef4444">Delete</button>
+          </td>\`;
+        tbody.appendChild(tr);
+      });
+    }
+    function fillForm(x){
+      editing = x.id;
+      ['name','sku','category','qty','price','threshold'].forEach(k=>$('#'+k).value = x[k]??'');
+    }
+    function toItem(){
+      return {
+        id: editing || (Math.random().toString(36).slice(2)),
+        name: $('#name').value.trim(),
+        sku: $('#sku').value.trim(),
+        category: $('#category').value.trim(),
+        qty: Number($('#qty').value||0),
+        price: Number($('#price').value||0),
+        threshold: Number($('#threshold').value||5)
+      };
+    }
+    window.addEventListener('DOMContentLoaded',()=>{
+      setActive('products');
+      render();
+      $('#form').addEventListener('submit',e=>{
+        e.preventDefault();
+        const it = toItem(); if(!it.name) return alert('Please enter product name');
+        upsert(it); editing=null; e.target.reset(); render();
+      });
+      $('#rows').addEventListener('click',e=>{
+        if(e.target.classList.contains('edit')){ const x=getItems()[e.target.dataset.i]; fillForm(x); }
+        if(e.target.classList.contains('del')){ if(confirm('Delete item?')){ remove(e.target.dataset.id); render(); } }
+      });
+      $('#btn-clear').onclick=()=>{ if(confirm('Clear all?')){ localStorage.removeItem('mini_inventory_v1'); render(); } }
+    });
+  </script>
+</head>
+<body>
+  <div class="nav">
+    <a href="index.html" data-page="dashboard">Dashboard</a>
+    <a href="products.html" data-page="products">Products</a>
+    <a href="stock.html" data-page="stock">Stock</a>
+  </div>
+  <div class="container">
+    <h1>Products</h1>
+    <div class="card">
+      <form id="form" class="grid grid2">
+        <div>
+          <label>Product name *</label><input id="name" required>
+          <label>SKU</label><input id="sku">
+          <label>Category</label><input id="category">
+        </div>
+        <div>
+          <label>Qty *</label><input id="qty" type="number" min="0" value="0" required>
+          <label>Price</label><input id="price" type="number" min="0" step="0.01" value="0">
+          <label>Threshold</label><input id="threshold" type="number" min="0" value="5">
+          <button>Save</button>
+          <button type="button" id="btn-clear" style="background:#475569">Clear all</button>
+        </div>
+      </form>
+    </div>
+    <div class="card">
+      <div class="toolbar muted small">List</div>
+      <table class="table">
+        <thead><tr><th>Name</th><th>Category</th><th>Qty</th><th>Price</th><th>Actions</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
