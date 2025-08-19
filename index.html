@@ -1,51 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mini Inventory - Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Inventory</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body data-page="dashboard">
-  
-<nav class="nav">
-  <div class="container nav-inner">
-    <strong>Mini Inventory</strong>
-    <div style="flex:1"></div>
-    <a data-page="dashboard" href="index.html">Dashboard</a>
-    <a data-page="products"  href="products.html">Products</a>
-    <a data-page="stock"     href="stock.html">Stock</a>
-  </div>
-</nav>
-
-  <main class="container">
-    <div class="card">
-      <h1>Dashboard</h1>
-      <div class="grid cols-2">
-        <div>
-          <div class="small">Products</div>
-          <div style="font-size:42px;font-weight:700" id="c-total-items">0</div>
-        </div>
-        <div>
-          <div class="small">Total Quantity</div>
-          <div style="font-size:42px;font-weight:700" id="c-total-qty">0</div>
-        </div>
-      </div>
-      <div style="margin-top:14px">
-        <div class="small">Low Stock (≤ threshold)</div>
-        <div style="font-size:28px;font-weight:700" id="c-low">0</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Recent items</h2>
-      <table class="table">
-        <thead><tr><th>Name</th><th>SKU</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
-        <tbody id="t-recent"></tbody>
-      </table>
-      <p class="small">Tip: Add items in <a href="products.html">Products</a>, check critical levels in <a href="stock.html">Stock</a>.</p>
-    </div>
-  </main>
-  <footer class="container small">Stored on your device (localStorage). No server required.</footer>
-  <script src="app.js"></script>
-</body></html>
+<body>
+    <header>
+        <h1>Mini Inventory System</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="products.html">Products</a>
+            <a href="about.html">About</a>
+        </nav>
+    </header>
+    <main>
+        <h2>Welcome to Mini Inventory</h2>
+        <p>This is a simple inventory system demo built with HTML & CSS.</p>
+    </main>
+    <footer>
+        <p>&copy; 2025 Mini Inventory Demo</p>
+    </footer>
+</body>
+</html>
