@@ -1,49 +1,52 @@
+
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mini Inventory - Stock</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Mini Inventory · Stock</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body data-page="stock">
-  
-<nav class="nav">
-  <div class="container nav-inner">
-    <strong>Mini Inventory</strong>
-    <div style="flex:1"></div>
-    <a data-page="dashboard" href="index.html">Dashboard</a>
-    <a data-page="products"  href="products.html">Products</a>
-    <a data-page="stock"     href="stock.html">Stock</a>
-  </div>
-</nav>
+  <header class="topbar">
+    <div class="brand">Mini Inventory</div>
+    <nav class="nav">
+      <a href="index.html" data-page="dashboard">Dashboard</a>
+      <a href="products.html" data-page="products">Products</a>
+      <a href="stock.html" data-page="stock">Stock</a>
+    </nav>
+  </header>
 
   <main class="container">
-    <div class="card">
-      <h1>Stock</h1>
+    <section class="card">
+      <h2>Stock</h2>
       <div class="toolbar">
-        <button id="btn-export" class="secondary">Export JSON</button>
-        <label class="secondary" style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid #e2e8f0;cursor:pointer">
-          Import JSON <input type="file" id="file-import" accept="application/json" style="display:none">
+        <button class="btn" id="btn-export">Export JSON</button>
+        <label class="btn outline file">
+          Import JSON <input id="file-import" type="file" accept="application/json" hidden/>
         </label>
-        <div style="flex:1"></div>
-        <button id="btn-clear" class="danger">Clear all</button>
       </div>
-      <h3>Low stock (≤ threshold)</h3>
-      <table class="table">
-        <thead><tr><th>Name</th><th>Qty</th><th>Threshold</th><th>SKU</th></tr></thead>
-        <tbody id="t-low"></tbody>
-      </table>
-    </div>
 
-    <div class="card">
-      <h2>All items</h2>
-      <table class="table">
-        <thead><tr><th>Name</th><th>SKU</th><th>Qty</th><th>Price</th></tr></thead>
-        <tbody id="t-all"></tbody>
-      </table>
-    </div>
+      <h3 class="mt">Low stock (≤ threshold)</h3>
+      <div class="table-wrap">
+        <table id="tbl-low">
+          <thead><tr><th>Name</th><th>Qty</th><th>Threshold</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <h3 class="mt">All items</h3>
+      <div class="table-wrap">
+        <table id="tbl-all">
+          <thead><tr><th>Name</th><th>SKU</th><th>Qty</th><th>Price</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="muted tip">No items yet. Please add products on the <a href="products.html">Products</a> page.</p>
+    </section>
   </main>
-  <footer class="container small">Need to add or edit? Go to <a href="products.html">Products</a>.</footer>
+
+  <footer class="footer">Stored on your device (localStorage). No server required.</footer>
   <script src="app.js"></script>
-</body></html>
+</body>
+</html>

@@ -1,28 +1,54 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini Inventory</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Mini Inventory · Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
-<body>
-  <header>
-    <h1>📦 Mini Inventory System</h1>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="products.html">Products</a>
-      <a href="about.html">About</a>
+<body data-page="dashboard">
+  <header class="topbar">
+    <div class="brand">Mini Inventory</div>
+    <nav class="nav">
+      <a href="index.html" data-page="dashboard">Dashboard</a>
+      <a href="products.html" data-page="products">Products</a>
+      <a href="stock.html" data-page="stock">Stock</a>
     </nav>
   </header>
 
-  <main>
-    <h2>Welcome!</h2>
-    <p>This is a simple inventory management demo built with HTML, CSS, and JavaScript.</p>
+  <main class="container">
+    <section class="card stats">
+      <h2>Dashboard</h2>
+      <div class="grid grid-3">
+        <div class="stat">
+          <div class="stat-label">Products</div>
+          <div class="stat-value" id="stat-products">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Total Quantity</div>
+          <div class="stat-value" id="stat-totalqty">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Low Stock (≤ threshold)</div>
+          <div class="stat-value warn" id="stat-low">0</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>Recent items</h3>
+      <div class="table-wrap">
+        <table id="tbl-recent">
+          <thead><tr><th>Name</th><th>SKU</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="muted tip">Tip: Add items in <a href="products.html">Products</a>, check critical levels in <a href="stock.html">Stock</a>.</p>
+    </section>
   </main>
 
-  <footer>
-    <p>© 2025 Mini Inventory</p>
-  </footer>
+  <footer class="footer">Stored on your device (localStorage). No server required.</footer>
+  <script src="app.js"></script>
 </body>
 </html>
